@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CloudSRMS - Cloud-Based Student Result Management System</title>
+  <meta name="description" content="State-of-the-art Cloud-Based Student Result Management System for universities, colleges, and academic institutions.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <!-- Chart.js for data visualizations -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+</head>
+<body>
+
+  <!-- Ambient Glow Effects -->
+  <div class="bg-ambient">
+    <div class="ambient-blob-1"></div>
+    <div class="ambient-blob-2"></div>
+  </div>
+
+  <div class="app-container">
+    <!-- Navbar -->
+    <header class="navbar">
+      <a href="#" class="nav-brand" id="brand-link">
+        <div class="brand-icon">🎓</div>
+        <div>
+          <div class="brand-title">CloudSRMS</div>
+          <div class="brand-badge">Cloud Engine v2.4</div>
+        </div>
+      </a>
+
+      <!-- Portal Switcher Tabs -->
+      <nav class="nav-tabs" aria-label="Portal Navigation">
+        <button class="nav-tab-btn active" id="tab-student" onclick="switchPortal('student')">
+          <span>🔍</span> Student Portal
+        </button>
+        <button class="nav-tab-btn" id="tab-admin" onclick="switchPortal('admin')">
+          <span>⚡</span> Faculty / Admin
+        </button>
+      </nav>
+
+      <!-- Utility Controls -->
+      <div class="nav-controls">
+        <div class="cloud-indicator" id="cloud-indicator" title="Connected to Cloud Storage">
+          <span class="cloud-dot"></span>
+          <span id="cloud-status-text">Cloud Sync: Active</span>
+        </div>
+        <button class="icon-btn" id="theme-toggle" onclick="toggleTheme()" title="Toggle Dark/Light Mode">
+          <span id="theme-icon">☀️</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- ====================================================================
+         SECTION 1: STUDENT RESULTS PORTAL
+         ==================================================================== -->
+    <main id="student-section">
+      <div class="hero-banner">
+        <div class="hero-pill">☁️ Official Examination & Grading Cloud</div>
+        <h1 class="hero-title">Academic Result & Performance <span class="hero-gradient">Portal</span></h1>
+        <p class="hero-subtitle">Instant, tamper-proof academic transcripts, grade cards, and performance analytics powered by cloud infrastructure.</p>
+      </div>
+
+      <!-- Quick Search Card -->
+      <div class="glass-card search-card">
+        <form id="result-search-form" onsubmit="handleStudentSearch(event)">
+          <div class="search-grid">
+            <div class="form-group">
+              <label class="form-label" for="search-roll">
+                <span>🆔</span> Roll Number / Enrollment ID
+              </label>
+              <input 
+                type="text" 
+                id="search-roll" 
+                class="form-control" 
+                placeholder="e.g. CS2024-001" 
+                required 
+                autocomplete="off"
+              >
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="search-semester">
+                <span>📚</span> Semester
+              </label>
+              <select id="search-semester" class="form-control">
+                <option value="All">All Semesters</option>
+                <option value="1">Semester 1</option>
+                <option value="2">Semester 2</option>
+                <option value="3">Semester 3</option>
+                <option value="4" selected>Semester 4</option>
+                <option value="5">Semester 5</option>
+                <option value="6">Semester 6</option>
+                <option value="7">Semester 7</option>
+                <option value="8">Semester 8</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="search-year">
+                <span>📅</span> Exam Session
+              </label>
+              <select id="search-year" class="form-control">
+                <option value="2025-2026">2025 - 2026</option>
+                <option value="2024-2025" selected>2024 - 2025</option>
+              </select>
+            </div>
+
+            <button type="submit" class="btn btn-primary" id="btn-fetch-result">
+              <span>🔎</span> Fetch Result
+            </button>
+          </div>
+        </form>
+
+        <!-- Quick Demo Chips -->
+        <div class="quick-chips">
+          <span class="chips-label">Quick Demo IDs:</span>
+          <button type="button" class="chip-btn" onclick="quickFill('CS2024-001')">CS2024-001 (Distinction)</button>
+          <button type="button" class="chip-btn" onclick="quickFill('CS2024-002')">CS2024-002 (First Class)</button>
+          <button type="button" class="chip-btn" onclick="quickFill('AI2024-015')">AI2024-015 (High CGPA)</button>
+          <button type="button" class="chip-btn" onclick="quickFill('EC2024-042')">EC2024-042 (Passing)</button>
+        </div>
+      </div>
+
+      <!-- Marksheet Presentation Box (Generated dynamically or hidden initially) -->
+      <div id="marksheet-container">
+        <!-- Injected via JavaScript once searched -->
+      </div>
+    </main>
+
+    <!-- ====================================================================
+         SECTION 2: FACULTY / ADMIN MANAGEMENT PORTAL
+         ==================================================================== -->
+    <section id="admin-section" style="display: none;">
+      <div class="section-header">
+        <div>
+          <h2 class="section-title"><span>⚡</span> Faculty & Controller of Examinations</h2>
+          <p style="color: var(--text-secondary); font-size: 0.9rem;">Publish, inspect, and analyze institutional grading records across semesters.</p>
+        </div>
+        <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
+          <button class="btn btn-primary" onclick="openAddModal()">
+            <span>➕</span> Add Student Result
+          </button>
+          <button class="btn btn-secondary" onclick="exportCSV()">
+            <span>📥</span> Export CSV
+          </button>
+          <button class="btn btn-secondary" onclick="openImportModal()">
+            <span>📤</span> Bulk Import
+          </button>
+          <button class="btn btn-secondary" onclick="resetToDefaultData()" title="Reset mock cloud database">
+            <span>🔄</span> Reset Demo
+          </button>
+        </div>
+      </div>
+
+      <!-- Admin KPI Stats -->
+      <div class="admin-stats-grid">
+        <div class="glass-card stat-card">
+          <div class="stat-icon blue">👨‍🎓</div>
+          <div class="stat-meta">
+            <h3 id="stat-total-students">0</h3>
+            <p>Total Evaluated</p>
+          </div>
+        </div>
+        <div class="glass-card stat-card">
+          <div class="stat-icon green">📈</div>
+          <div class="stat-meta">
+            <h3 id="stat-pass-percentage">0%</h3>
+            <p>Overall Pass Rate</p>
+          </div>
+        </div>
+        <div class="glass-card stat-card">
+          <div class="stat-icon purple">🏆</div>
+          <div class="stat-meta">
+            <h3 id="stat-avg-cgpa">0.00</h3>
+            <p>Average SGPA</p>
+          </div>
+        </div>
+        <div class="glass-card stat-card">
+          <div class="stat-icon orange">🏢</div>
+          <div class="stat-meta">
+            <h3 id="stat-departments">4</h3>
+            <p>Active Departments</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Admin Overview Charts -->
+      <div class="glass-card" style="margin-bottom: 2rem;">
+        <h3 style="font-size: 1.15rem; font-weight: 700; margin-bottom: 1.25rem;">📊 Institutional Grade & Performance Distribution</h3>
+        <div class="analytics-grid">
+          <div>
+            <h4 style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 0.75rem;">Grade Classification</h4>
+            <div class="chart-box">
+              <canvas id="adminGradeChart"></canvas>
+            </div>
+          </div>
+          <div>
+            <h4 style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 0.75rem;">Pass vs Backlog Ratio</h4>
+            <div class="chart-box">
+              <canvas id="adminPassChart"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Records Table Section -->
+      <div class="glass-card">
+        <div class="filter-bar">
+          <input 
+            type="text" 
+            id="admin-search-input" 
+            class="form-control filter-input" 
+            placeholder="Search by Roll No, Name, or Branch..." 
+            oninput="renderAdminTable()"
+          >
+          <select id="admin-dept-filter" class="form-control" style="width: auto; min-width: 180px;" onchange="renderAdminTable()">
+            <option value="All">All Departments</option>
+            <option value="Computer Science & Engineering">Computer Science</option>
+            <option value="Artificial Intelligence & ML">AI & Machine Learning</option>
+            <option value="Electronics & Communication">Electronics & Comm.</option>
+            <option value="Mechanical Engineering">Mechanical Engg.</option>
+          </select>
+          <select id="admin-sem-filter" class="form-control" style="width: auto; min-width: 140px;" onchange="renderAdminTable()">
+            <option value="All">All Semesters</option>
+            <option value="1">Semester 1</option>
+            <option value="2">Semester 2</option>
+            <option value="3">Semester 3</option>
+            <option value="4">Semester 4</option>
+            <option value="5">Semester 5</option>
+            <option value="6">Semester 6</option>
+          </select>
+        </div>
+
+        <div class="results-table-container" style="padding: 0;">
+          <table class="results-table">
+            <thead>
+              <tr>
+                <th>Roll Number</th>
+                <th>Student Name</th>
+                <th>Department</th>
+                <th>Sem</th>
+                <th>Marks</th>
+                <th>SGPA</th>
+                <th>Status</th>
+                <th style="text-align: right;">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="admin-records-body">
+              <!-- Injected by JavaScript -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <div><strong>CloudSRMS</strong> &bull; Enterprise Cloud-Based Student Result Management System</div>
+      <div>Designed with modern web standards &bull; Zero dependencies required &bull; Ready for GitHub deployment</div>
+    </footer>
+  </div>
+
+  <!-- ====================================================================
+       MODAL 1: ADD / EDIT STUDENT RESULT
+       ==================================================================== -->
+  <div class="modal-overlay" id="modal-result">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title" id="modal-result-title">Publish Academic Result</h3>
+        <button class="icon-btn" onclick="closeModal('modal-result')">&times;</button>
+      </div>
+      <form id="result-form" onsubmit="saveStudentResult(event)">
+        <div class="modal-body">
+          <input type="hidden" id="edit-record-id">
+          
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+            <div class="form-group">
+              <label class="form-label" for="form-roll">Roll Number *</label>
+              <input type="text" id="form-roll" class="form-control" placeholder="e.g. CS2024-005" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="form-name">Student Full Name *</label>
+              <input type="text" id="form-name" class="form-control" placeholder="e.g. Maya Sharma" required>
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1.5fr 1fr 1fr; gap: 1rem;">
+            <div class="form-group">
+              <label class="form-label" for="form-dept">Department *</label>
+              <select id="form-dept" class="form-control" required>
+                <option value="Computer Science & Engineering">Computer Science & Engineering</option>
+                <option value="Artificial Intelligence & ML">Artificial Intelligence & ML</option>
+                <option value="Electronics & Communication">Electronics & Communication</option>
+                <option value="Mechanical Engineering">Mechanical Engineering</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="form-sem">Semester *</label>
+              <select id="form-sem" class="form-control" required>
+                <option value="1">Semester 1</option>
+                <option value="2">Semester 2</option>
+                <option value="3">Semester 3</option>
+                <option value="4" selected>Semester 4</option>
+                <option value="5">Semester 5</option>
+                <option value="6">Semester 6</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="form-year">Academic Session</label>
+              <input type="text" id="form-year" class="form-control" value="2024-2025" required>
+            </div>
+          </div>
+
+          <!-- Subject Entries -->
+          <div>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin: 1rem 0 0.5rem;">
+              <label class="form-label">Course Subjects & Marks</label>
+              <button type="button" class="btn btn-secondary btn-sm" onclick="addSubjectRow()">+ Add Subject</button>
+            </div>
+            <div id="subject-rows-container">
+              <!-- Dynamically populated rows -->
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="closeModal('modal-result')">Cancel</button>
+          <button type="submit" class="btn btn-primary" id="btn-save-result">Save & Publish</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ====================================================================
+       MODAL 2: BULK CSV IMPORT
+       ==================================================================== -->
+  <div class="modal-overlay" id="modal-import">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">Bulk Import Results via CSV</h3>
+        <button class="icon-btn" onclick="closeModal('modal-import')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p style="font-size: 0.88rem; color: var(--text-secondary);">
+          Upload a CSV file containing columns: <code>RollNo, Name, Department, Semester, Subjects(Code:Name:Score:Max:Credits;)</code>
+        </p>
+
+        <div class="form-group">
+          <label class="form-label">Select CSV File</label>
+          <input type="file" id="csv-file-input" accept=".csv" class="form-control">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Or Paste CSV Text Directly</label>
+          <textarea id="csv-text-input" class="form-control" rows="5" placeholder="CS2024-099,Arun Kumar,Computer Science & Engineering,4,CS401:Cloud Computing:88:100:4;CS402:DBMS:92:100:4"></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" onclick="closeModal('modal-import')">Cancel</button>
+        <button type="button" class="btn btn-primary" onclick="handleCSVImport()">Import Records</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <!-- Application Logic -->
+  <script src="app.js"></script>
+</body>
+</html>
